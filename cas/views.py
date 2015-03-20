@@ -187,7 +187,7 @@ def login(request, next_page=None, required=False, gateway=False):
                 return HttpResponseRedirect(_login_url(service, ticket, False))
         else:
             # Has ticket, not session
-            if getattr(settings, 'CAS_CUSTOM_FORBIDDEN'):
+            if getattr(settings, 'CAS_CUSTOM_FORBIDDEN') and not gateway:
 
                 return HttpResponseRedirect(reverse(settings.CAS_CUSTOM_FORBIDDEN) + "?" + request.META['QUERY_STRING'])
             else:
