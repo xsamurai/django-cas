@@ -187,8 +187,14 @@ def login(request, next_page=None, required=False, gateway=False):
                 return HttpResponseRedirect(_login_url(service, ticket, False))
         else:
             # Has ticket, not session
-            if getattr(settings, 'CAS_CUSTOM_FORBIDDEN') and not gateway:
+            logger.info('User has a ticket but no valid session.  Redirecting to Forbidden page.')
 
+            if gateway:
+                # User is gatewayed, so just attempt to relay them back to login.
+                logger.info('User is forbidden but gatewayed.  Redirect back to signin.')
+                return HttpResponseRedirect(_login_url(service, ticket, True))
+
+            if getattr(settings, 'CAS_CUSTOM_FORBIDDEN'):
                 return HttpResponseRedirect(reverse(settings.CAS_CUSTOM_FORBIDDEN) + "?" + request.META['QUERY_STRING'])
             else:
                 error = "<h1>Forbidden</h1><p>Login failed.</p>"
